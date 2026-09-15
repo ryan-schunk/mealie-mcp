@@ -2516,4 +2516,16 @@ def resource_shopping_list_detail(list_id: str) -> str:
 # =============================================================================
 
 if __name__ == "__main__":
-    mcp.run()
+    # stdio for local Claude Code; http for the Cloudflare-fronted connector.
+    transport = os.environ.get("MCP_TRANSPORT", "stdio")
+    if os.environ.get("MEALIE_TOOL_PROFILE") == "mobile":
+        from mobile_profile import MobileProfile
+        mcp.add_middleware(MobileProfile())
+    if transport == "stdio":
+        mcp.run()
+    else:
+        mcp.run(
+            transport="http",
+            host=os.environ.get("MCP_HOST", "127.0.0.1"),
+            port=int(os.environ.get("MCP_PORT", "8932")),
+        )
